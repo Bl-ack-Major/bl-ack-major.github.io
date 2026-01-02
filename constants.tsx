@@ -117,7 +117,7 @@ export const BOOT_LOGS = [
 ];
 
 export const BIOS_SPECS = [
-    "ASUS UEFI BIOS (C) 2025 Alex Mercer Engineering",
+    "ASUS UEFI BIOS (C) 2025 Keamo KaliOS Engineering",
     "CPU: AMD Ryzen 9 7950X @ 4.5GHz",
     "MEM: 64GB DDR5 6000MHz",
     "STORAGE: NVMe Gen5 4TB Detected",
