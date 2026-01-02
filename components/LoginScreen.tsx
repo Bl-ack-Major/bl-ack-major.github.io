@@ -15,18 +15,18 @@ interface LoginScreenProps {
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, isRecruiterSafeMode = false }) => {
-    const displayedUsers = isRecruiterSafeMode 
+    const displayedUsers = isRecruiterSafeMode
         ? USER_PROFILES.filter(u => u.id === 'recruiter')
         : USER_PROFILES;
-    
+
     const [isLightMode, setIsLightMode] = useState(isRecruiterSafeMode);
-    
+
     const [selectedUser, setSelectedUser] = useState<typeof displayedUsers[0] | null>(null);
     const [focusedUserIndex, setFocusedUserIndex] = useState<number>(0);
     const [password, setPassword] = useState('');
     const [error, setError] = useState(false);
     const [isAuthenticating, setIsAuthenticating] = useState(false);
-    
+
     const [currentTime, setCurrentTime] = useState(new Date());
     const [startAnimations, setStartAnimations] = useState(false);
 
@@ -80,7 +80,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, isRecruiterSa
         if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
 
         if (selectedUser?.id === 'recruiter') {
-            if (!isRecruiterSafeMode) setIsLightMode(true); 
+            if (!isRecruiterSafeMode) setIsLightMode(true);
             setPassword('');
             const targetPassword = "Welcome2026";
             let currentIndex = 0;
@@ -97,7 +97,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, isRecruiterSa
             };
             typingTimeoutRef.current = setTimeout(typeNextChar, 800);
         } else {
-            if (selectedUser && !isRecruiterSafeMode) setIsLightMode(false); 
+            if (selectedUser && !isRecruiterSafeMode) setIsLightMode(false);
             setPassword('');
         }
 
@@ -117,7 +117,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, isRecruiterSa
         setSelectedUser(null);
         setPassword('');
         setError(false);
-        if (!isRecruiterSafeMode) setIsLightMode(false); 
+        if (!isRecruiterSafeMode) setIsLightMode(false);
     };
 
     const handleLogin = (e?: React.FormEvent) => {
@@ -126,13 +126,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, isRecruiterSa
         if (isAuthenticating) return;
 
         setIsAuthenticating(true);
-        
+
         setTimeout(() => {
             const accountType = validateLogin(selectedUser.id, password);
-            
+
             if (accountType) {
                 const isHack = selectedUser.id === 'keamo' && accountType === AccountType.ADMINISTRATOR;
-                
+
                 if (isHack && difficulty === 'hard') {
                     trackEvent('CTF_PROGRESS', 'ROOT_ACCESS');
                 }
@@ -172,12 +172,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, isRecruiterSa
                     // Enter is handled by button onClick/onKeyDown naturally if focused, 
                     // but we ensure it here if focus is somehow lost but index is tracked
                     if (document.activeElement !== userRefs.current[focusedUserIndex]) {
-                         handleUserClick(displayedUsers[focusedUserIndex]);
+                        handleUserClick(displayedUsers[focusedUserIndex]);
                     }
                 }
             }
         };
-        
+
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [focusedUserIndex, selectedUser, displayedUsers]);
@@ -210,7 +210,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, isRecruiterSa
 
                 <div className="flex items-center gap-2 md:gap-4">
                     {!isRecruiterSafeMode && (
-                        <button 
+                        <button
                             onClick={() => setIsLightMode(!isLightMode)}
                             className={`p-1.5 md:p-2 rounded-full transition-all hover:bg-white/10 ${isLightMode ? 'text-slate-600 hover:bg-white/50' : 'text-gray-400'}`}
                         >
@@ -227,7 +227,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, isRecruiterSa
             <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
                 <div className={`flex flex-wrap justify-center gap-4 md:gap-16 transition-all duration-500 ${selectedUser ? 'scale-95 opacity-0 pointer-events-none absolute' : 'scale-100 opacity-100'}`}>
                     {displayedUsers.map((user, idx) => (
-                        <button 
+                        <button
                             key={user.id}
                             ref={el => { userRefs.current[idx] = el; }}
                             onClick={() => handleUserClick(user)}
@@ -241,11 +241,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, isRecruiterSa
                             <div className="relative mb-3 md:mb-6">
                                 {/* Visual Focus Ring / Glow - Triggers on hover AND group-focus-visible */}
                                 <div className="absolute -inset-1 bg-gradient-to-tr from-cyan-500 to-fuchsia-600 rounded-full blur opacity-0 group-hover:opacity-75 group-focus-visible:opacity-75 transition-all duration-500 group-hover:scale-110 group-focus-visible:scale-110"></div>
-                                
+
                                 <div className={`relative w-20 h-20 md:w-32 md:h-32 rounded-full overflow-hidden border-2 transition-all duration-300 ${isLightMode ? 'border-white shadow-lg group-hover:border-transparent group-focus-visible:border-transparent' : 'border-white/10 group-hover:border-transparent group-focus-visible:border-transparent bg-black'}`}>
-                                    <img 
-                                        src={`https://ui-avatars.com/api/?name=${user.name}&background=${isLightMode ? 'f1f5f9' : '111827'}&color=${isLightMode ? '475569' : 'fff'}&size=128`} 
-                                        alt={user.name} 
+                                    <img
+                                        src={`https://ui-avatars.com/api/?name=${user.name}&background=${isLightMode ? 'f1f5f9' : '111827'}&color=${isLightMode ? '475569' : 'fff'}&size=128`}
+                                        alt={user.name}
                                         className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-focus-visible:opacity-100"
                                     />
                                 </div>
@@ -254,11 +254,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, isRecruiterSa
                             <h3 className={`text-xs md:text-lg font-medium tracking-wide mb-1 transition-colors text-center ${isLightMode ? 'text-slate-800 font-bold group-hover:text-black' : 'text-gray-300 group-hover:text-white'}`}>
                                 {user.name}
                             </h3>
-                            <span className={`text-[7px] md:text-[10px] uppercase tracking-widest font-bold px-1.5 md:px-2 py-0.5 rounded border ${
-                                isLightMode 
-                                    ? 'bg-white/50 border-slate-300 text-slate-600 shadow-sm' 
+                            <span className={`text-[7px] md:text-[10px] uppercase tracking-widest font-bold px-1.5 md:px-2 py-0.5 rounded border ${isLightMode
+                                    ? 'bg-white/50 border-slate-300 text-slate-600 shadow-sm'
                                     : 'bg-white/5 border-white/10 text-gray-500 group-hover:border-cyan-500/30 group-hover:text-cyan-400'
-                            }`}>
+                                }`}>
                                 {user.role}
                             </span>
                         </button>
@@ -270,9 +269,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, isRecruiterSa
                         <div className="relative mb-6 md:mb-8">
                             <div className="absolute -inset-4 bg-cyan-500/20 rounded-full blur-xl animate-pulse"></div>
                             <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-white/20 relative z-10 shadow-2xl">
-                                <img 
-                                    src={`https://ui-avatars.com/api/?name=${selectedUser.name}&background=${isLightMode ? 'f1f5f9' : '111827'}&color=${isLightMode ? '475569' : 'fff'}&size=128`} 
-                                    alt={selectedUser.name} 
+                                <img
+                                    src={`https://ui-avatars.com/api/?name=${selectedUser.name}&background=${isLightMode ? 'f1f5f9' : '111827'}&color=${isLightMode ? '475569' : 'fff'}&size=128`}
+                                    alt={selectedUser.name}
                                     className="w-full h-full object-cover"
                                 />
                             </div>
@@ -289,8 +288,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, isRecruiterSa
                                 autoFocus
                                 className={`
                                     w-32 py-2 rounded-full font-bold text-xs tracking-widest uppercase transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-2 border focus:outline-none focus-visible:ring-2
-                                    ${isLightMode 
-                                        ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50 hover:border-slate-400 shadow-sm focus-visible:ring-blue-400' 
+                                    ${isLightMode
+                                        ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50 hover:border-slate-400 shadow-sm focus-visible:ring-blue-400'
                                         : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white hover:border-white/20 focus-visible:ring-cyan-400'
                                     }
                                 `}
@@ -308,8 +307,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, isRecruiterSa
                             <form onSubmit={handleLogin} className="w-full max-w-[280px] relative group">
                                 <div className={`
                                     flex items-center rounded-lg overflow-hidden transition-all duration-300
-                                    ${isLightMode 
-                                        ? 'bg-white/70 border border-slate-300 focus-within:ring-2 focus-within:ring-blue-400 focus-within:bg-white shadow-lg' 
+                                    ${isLightMode
+                                        ? 'bg-white/70 border border-slate-300 focus-within:ring-2 focus-within:ring-blue-400 focus-within:bg-white shadow-lg'
                                         : 'bg-black/30 border border-white/10 focus-within:border-cyan-500/50 focus-within:bg-black/50 focus-within:shadow-[0_0_15px_rgba(6,182,212,0.1)]'}
                                 `}>
                                     <input
@@ -319,16 +318,25 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, isRecruiterSa
                                         onChange={(e) => { setPassword(e.target.value); setError(false); }}
                                         placeholder={selectedUser.id === 'recruiter' ? 'Auto-typing...' : 'Password'}
                                         className={`
-                                            w-full py-3 px-4 bg-transparent outline-none text-sm font-mono tracking-widest text-center cursor-text
+                                            w-full py-3 pl-4 pr-10 bg-transparent outline-none text-sm font-mono tracking-widest text-center cursor-text
                                             ${isLightMode ? 'text-slate-800 placeholder-slate-500' : 'text-white placeholder-gray-600'}
                                         `}
                                         readOnly={selectedUser.id === 'recruiter'}
                                     />
-                                    {isAuthenticating && (
-                                        <div className="absolute right-3 animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full text-cyan-500"></div>
-                                    )}
+                                    <div className="absolute right-2 flex items-center">
+                                        {isAuthenticating ? (
+                                            <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full text-cyan-500 mr-2"></div>
+                                        ) : (
+                                            <button
+                                                type="submit"
+                                                className={`p-1.5 rounded-md transition-colors ${isLightMode ? 'hover:bg-slate-200 text-slate-500' : 'hover:bg-white/10 text-gray-400 hover:text-white'}`}
+                                            >
+                                                <ArrowRight size={16} />
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
-                                
+
                                 {error && (
                                     <div className="absolute top-full left-0 w-full text-center mt-3">
                                         <span className="text-[10px] md:text-xs text-red-400 bg-red-900/10 px-3 py-1 rounded border border-red-500/20 animate-pulse">
@@ -336,12 +344,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, isRecruiterSa
                                         </span>
                                     </div>
                                 )}
-                                
-                                <button type="submit" className="hidden" disabled={isAuthenticating} />
                             </form>
                         )}
 
-                        <button 
+                        <button
                             onClick={handleBack}
                             className={`
                                 mt-10 md:mt-12 flex items-center gap-2 text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all hover:-translate-x-1 opacity-60 hover:opacity-100 focus:outline-none focus-visible:underline
