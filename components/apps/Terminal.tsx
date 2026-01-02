@@ -10,12 +10,11 @@ import { useFileSystem } from '../../hooks/useFileSystem';
 import { useQuest } from '../../contexts/QuestContext';
 import { askGemini } from '../../services/geminiService';
 import { useTheme } from '../../contexts/ThemeContext';
-import DOMPurify from 'dompurify'; // You might need to add this to package.json if it was a real environment, but here we can simulate or rely on React escaping
 import { useNarrative } from '../../contexts/NarrativeContext';
 
 const COMMON_UNIMPLEMENTED = [
-    'rm', 'vi', 'vim', 'nano', 
-    'chmod', 'chown', 'useradd', 'apt', 'apt-get', 
+    'rm', 'vi', 'vim', 'nano',
+    'chmod', 'chown', 'useradd', 'apt', 'apt-get',
     'su', 'reboot', 'shutdown', 'mv', 'cp', 'ifconfig', 'ip'
 ];
 
@@ -27,16 +26,16 @@ const Terminal: React.FC = () => {
     const [isTopRunning, setIsTopRunning] = useState(false);
     const [isMatrixRunning, setIsMatrixRunning] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
-    
+
     const bottomRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    
+
     const { playSound } = useSound();
     const { account } = useAuth();
-    const { advanceStage, stage } = useChallenge(); 
+    const { advanceStage, stage } = useChallenge();
     const { currentPath, changeDir, readdir, readFile, mkdir, touch } = useFileSystem();
-    const { trackEvent, level } = useQuest(); 
+    const { trackEvent, level } = useQuest();
     const { isLightMode } = useTheme();
     const { discoverClue } = useNarrative();
 
@@ -48,7 +47,8 @@ const Terminal: React.FC = () => {
 
     useEffect(() => {
         const handleClick = () => {
-            if (!isTopRunning && !isMatrixRunning && !window.getSelection()?.toString() && !isProcessing) {
+            // On mobile, do not auto-focus on global clicks to prevent keyboard from popping up
+            if (!isTopRunning && !isMatrixRunning && !window.getSelection()?.toString() && !isProcessing && window.innerWidth >= 768) {
                 inputRef.current?.focus();
             }
         };
@@ -81,15 +81,15 @@ const Terminal: React.FC = () => {
 
         const interval = setInterval(() => {
             if (isLightMode) {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; 
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#059669'; 
+                ctx.fillStyle = '#059669';
             } else {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; 
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#0F0';
             }
-            
+
             ctx.font = '15px monospace';
 
             for (let i = 0; i < drops.length; i++) {
@@ -141,21 +141,21 @@ const Terminal: React.FC = () => {
         };
 
         if (command.startsWith('./')) {
-             const filename = command.substring(2);
-             let content = "";
-             try {
-                 content = readFile(filename) || "";
-             } catch(e: any) {
-                 return `bash: ${filename}: No such file or directory`;
-             }
-             
-             if (content.startsWith('echo ')) return content.substring(5).replace(/['"]/g, '');
-             if (content.includes('console.log("')) {
-                 const match = content.match(/console\.log\(\s*["'](.+)["']\s*\)/);
-                 return match ? match[1] : "";
-             }
-             
-             return `bash: ${filename}: permission denied (simulation: script not executable)`;
+            const filename = command.substring(2);
+            let content = "";
+            try {
+                content = readFile(filename) || "";
+            } catch (e: any) {
+                return `bash: ${filename}: No such file or directory`;
+            }
+
+            if (content.startsWith('echo ')) return content.substring(5).replace(/['"]/g, '');
+            if (content.includes('console.log("')) {
+                const match = content.match(/console\.log\(\s*["'](.+)["']\s*\)/);
+                return match ? match[1] : "";
+            }
+
+            return `bash: ${filename}: permission denied (simulation: script not executable)`;
         }
 
         switch (command) {
@@ -183,7 +183,7 @@ const Terminal: React.FC = () => {
                 return currentPath;
 
             case 'cd':
-                if (args.length === 0) return ""; 
+                if (args.length === 0) return "";
                 try {
                     changeDir(args[0]);
                     return "";
@@ -252,7 +252,7 @@ const Terminal: React.FC = () => {
                 if (args.length === 0) return "Welcome to Node.js v18.16.0.\nType \".help\" for more information.";
                 const jsContent = getTextContent(args);
                 if (!jsContent || jsContent.startsWith('Error') || jsContent.startsWith('cat:')) return `node: internal/modules/cjs/loader.js:988: throw err;`;
-                
+
                 const logMatch = jsContent.match(/console\.log\(\s*["'](.+)["']\s*\)/);
                 if (logMatch) return logMatch[1];
                 return "";
@@ -271,54 +271,54 @@ const Terminal: React.FC = () => {
                     const res = args.map(c => String.fromCharCode(parseInt(c, 10))).join('');
                     const fullArgs = args.join(' ');
                     if (fullArgs.includes('101') && fullArgs.includes('72') && fullArgs.includes('65') && fullArgs.includes('99')) {
-                        advanceStage(1); 
+                        advanceStage(1);
                         trackEvent('CTF_PROGRESS', 'FRAGMENT_2');
                     }
                     return `Result: ${res}`;
                 } catch (e) { return 'Error: Invalid ASCII codes. Usage: ascii 65 66 67'; }
 
             case 'decode64':
-                 try {
+                try {
                     const decoded = atob(args[0] || '');
-                    
+
                     if (decoded.trim() === 'yOuHav') {
-                        advanceStage(0); 
+                        advanceStage(0);
                         trackEvent('CTF_PROGRESS', 'FRAGMENT_1');
                     }
-                    
+
                     if (decoded.includes('admin:yOuHaveHAckedM3.EnJOY') || decoded.includes('admin:YouThoughtYouWereSmart')) {
-                        advanceStage(3); 
+                        advanceStage(3);
                         trackEvent('CTF_PROGRESS', 'FRAGMENT_4');
                     }
-                    
+
                     return `Decoded: ${decoded}`;
                 } catch (e) { return 'Error: Invalid Base64 string'; }
 
             case 'charat':
-                 if (args.length < 2) return "Usage: charat \"string\" index1 index2...";
-                 try {
-                     const fullArgs = args.join(' ');
-                     const quoteMatch = fullArgs.match(/"([^"]+)"/);
-                     if (!quoteMatch) return "Error: String must be in quotes.";
-                     
-                     const text = quoteMatch[1];
-                     const indices = fullArgs.replace(quoteMatch[0], '').trim().split(/\s+/).map(n => parseInt(n));
-                     
-                     const result = indices.map(i => text[i] || '').join('');
-                     
-                     if (text === "Stack code demo M3" && indices.includes(4) && indices.includes(9) && indices.includes(8) && indices.includes(16) && indices.includes(17)) {
-                         advanceStage(2); 
-                         trackEvent('CTF_PROGRESS', 'FRAGMENT_3');
-                     }
-                     return `Result: ${result}`;
-                 } catch (e) {
-                     return "Error: Could not parse arguments.";
-                 }
+                if (args.length < 2) return "Usage: charat \"string\" index1 index2...";
+                try {
+                    const fullArgs = args.join(' ');
+                    const quoteMatch = fullArgs.match(/"([^"]+)"/);
+                    if (!quoteMatch) return "Error: String must be in quotes.";
+
+                    const text = quoteMatch[1];
+                    const indices = fullArgs.replace(quoteMatch[0], '').trim().split(/\s+/).map(n => parseInt(n));
+
+                    const result = indices.map(i => text[i] || '').join('');
+
+                    if (text === "Stack code demo M3" && indices.includes(4) && indices.includes(9) && indices.includes(8) && indices.includes(16) && indices.includes(17)) {
+                        advanceStage(2);
+                        trackEvent('CTF_PROGRESS', 'FRAGMENT_3');
+                    }
+                    return `Result: ${result}`;
+                } catch (e) {
+                    return "Error: Could not parse arguments.";
+                }
 
             case 'gemini':
                 if (args.length === 0) return "gemini: missing prompt. Usage: gemini \"your question\"";
                 const prompt = args.join(' ');
-                trackEvent('TERMINAL_CMD', 'gemini'); 
+                trackEvent('TERMINAL_CMD', 'gemini');
                 return await askGemini(prompt);
 
             case 'msfconsole':
@@ -386,8 +386,8 @@ udp        0      0 192.168.1.15:bootpc     192.168.1.1:bootps      ESTABLISHED`
                 return "  (  ) (@@) ( )  (@)  ()    @@    O     @     O     @\n (@@@)  )(    (@@)  (@@)  (@@)  (@@)  (@@)  (@@)  (@@)\n (   )  (    (   )  (   )  (   )  (   )  (   )  (   )\n  (@@)  (    (@@)  (@@)  (@@)  (@@)  (@@)  (@@)  (@@";
 
             case 'neofetch':
-                return NEOFETCH_ART + 
-`
+                return NEOFETCH_ART +
+                    `
 OS: Kali GNU/Linux Rolling x86_64
 Host: Portfolio VM
 Kernel: 6.5.0-kali3-amd64
@@ -404,7 +404,7 @@ Memory: 32768MiB
 
             case 'help':
                 const allCmds = getAvailableCommands(account?.accountType || AccountType.GUEST).sort();
-                
+
                 const fileSystem = ['ls', 'cd', 'pwd', 'mkdir', 'touch', 'cat', 'rm', 'cp', 'mv'];
                 const network = ['ping', 'whois', 'netstat', 'ifconfig', 'ip', 'aircrack-ng', 'nmap'];
                 const tools = ['node', 'grep', 'searchsploit', 'msfconsole', 'john'];
@@ -430,7 +430,7 @@ Memory: 32768MiB
                 });
 
                 let helpOutput = `GNU bash, version 5.1.16(1)-release\nThese shell commands are defined internally. Type 'help' to see this list.\n\n`;
-                
+
                 Object.keys(grouped).forEach(cat => {
                     helpOutput += `--- ${cat} ---\n`;
                     helpOutput += grouped[cat].join(', ') + '\n\n';
@@ -479,17 +479,17 @@ Memory: 32768MiB
         if (e.key === 'Enter') {
             const cmd = input.trim();
             setHistory(prev => [...prev, `${account?.username || 'guest'}@kali:${currentPath}$ ${cmd}`]);
-            
+
             if (cmd) {
                 setCommandHistory(prev => [...prev, cmd]);
                 setHistoryIndex(-1);
                 playSound(SOUND_KEYS.TYPING);
-                
+
                 if (cmd.includes('|')) {
                     const pipeParts = cmd.split('|');
                     let pipeInput: string | null = null;
                     let lastOutput = '';
-                    
+
                     setIsProcessing(true);
                     for (const part of pipeParts) {
                         lastOutput = await executeSingleCommand(part.trim(), pipeInput);
@@ -504,7 +504,7 @@ Memory: 32768MiB
                     if (output) setHistory(prev => [...prev, output]);
                 }
             }
-            
+
             setInput('');
         } else if (e.key === 'ArrowUp') {
             e.preventDefault();
@@ -532,7 +532,7 @@ Memory: 32768MiB
             e.preventDefault();
             const parts = input.split(' ');
             const currentWord = parts[parts.length - 1];
-            
+
             if (!currentWord) return;
 
             const commands = getAvailableCommands(account?.accountType || AccountType.GUEST);
@@ -548,7 +548,7 @@ Memory: 32768MiB
                 setInput(parts.join(' ') + ' ');
             } else if (candidates.length > 1) {
                 setHistory(prev => [
-                    ...prev, 
+                    ...prev,
                     `${account?.username || 'guest'}@kali:${currentPath}$ ${input}`,
                     candidates.join('  ')
                 ]);
@@ -564,7 +564,7 @@ Memory: 32768MiB
                 <div className="mb-2">Tasks: 187 total,   1 running, 186 sleeping,   0 stopped,   0 zombie</div>
                 <div className="mb-2">%Cpu(s):  1.5 us,  0.5 sy,  0.0 ni, 97.9 id,  0.0 wa,  0.0 hi,  0.1 si,  0.0 st</div>
                 <div className="mb-4">MiB Mem :  32768.0 total,  28500.0 free,   2500.0 used,   1768.0 buff/cache</div>
-                
+
                 <table className="w-full text-left table-auto">
                     <thead>
                         <tr className={`${isLightMode ? 'bg-slate-200 text-slate-900' : 'bg-white text-black'}`}>
@@ -595,10 +595,19 @@ Memory: 32768MiB
         ? "bg-transparent border-none outline-none text-slate-900 flex-1 caret-indigo-600 disabled:opacity-50 font-medium placeholder-slate-400"
         : "bg-transparent border-none outline-none text-[#00ff00] flex-1 caret-white disabled:opacity-50";
 
+    const isMobile = window.innerWidth < 768;
+
     return (
-        <div 
-            className={terminalClasses} 
-            onClick={() => inputRef.current?.focus()}
+        <div
+            className={terminalClasses}
+            style={{ WebkitOverflowScrolling: 'touch' }}
+            onClick={() => {
+                // On mobile, only focus if tapping the input directly (handled by input's onClick), 
+                // preventing keyboard popup when just tapping/scrolling the terminal area
+                if (!isMobile) {
+                    inputRef.current?.focus();
+                }
+            }}
         >
             {isMatrixRunning && (
                 <div className={`absolute inset-0 z-50 ${isLightMode ? 'bg-white/80' : 'bg-black'}`}>
@@ -612,7 +621,7 @@ Memory: 32768MiB
             {!isLightMode && (
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none"></div>
             )}
-            
+
             {!isLightMode && (
                 <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-black/10 bg-[length:100%_4px]"></div>
             )}
@@ -621,7 +630,7 @@ Memory: 32768MiB
                 {history.map((line, i) => (
                     <div key={i} className="whitespace-pre-wrap break-words leading-relaxed">{line}</div>
                 ))}
-                
+
                 {isProcessing && <div className={isLightMode ? "text-indigo-500 animate-pulse" : "text-blue-400 animate-pulse"}>Processing...</div>}
 
                 <div className="flex items-center" ref={bottomRef}>
@@ -639,7 +648,7 @@ Memory: 32768MiB
                         onKeyDown={handleKeyDown}
                         disabled={isProcessing}
                         className={inputClass}
-                        autoFocus
+                        autoFocus={!isMobile}
                         spellCheck={false}
                         autoComplete="off"
                     />
