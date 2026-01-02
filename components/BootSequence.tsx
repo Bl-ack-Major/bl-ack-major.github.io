@@ -744,6 +744,23 @@ const BootSequence: React.FC<BootSequenceProps> = ({ onComplete, onSafeModeSelec
                             return (
                                 <div
                                     key={i}
+                                    onClick={() => {
+                                        // If already selected, execute the action (simulates double-click / second tap)
+                                        if (selectedGrubIndex === i) {
+                                            playSound(SOUND_KEYS.UI_CLICK);
+                                            switch (opt.action) {
+                                                case 'boot': setStage(BootStage.SPLASH); break;
+                                                case 'advanced': setStage(BootStage.ADVANCED_MENU); setSelectedGrubIndex(0); break;
+                                                case 'recovery': setStage(BootStage.RECOVERY); break;
+                                                case 'memtest': setStage(BootStage.MEMTEST); break;
+                                                case 'bios': setStage('UEFI_SETUP'); break;
+                                            }
+                                        } else {
+                                            // First tap: select the option
+                                            setSelectedGrubIndex(i);
+                                            playSound(SOUND_KEYS.CLICK);
+                                        }
+                                    }}
                                     className={`
                                     group px-4 md:px-8 py-2.5 md:py-5 rounded-xl md:rounded-2xl flex items-center justify-between transition-all duration-500 cursor-pointer border
                                     ${selectedGrubIndex === i
@@ -762,7 +779,7 @@ const BootSequence: React.FC<BootSequenceProps> = ({ onComplete, onSafeModeSelec
                     </div>
 
                     <div className="mt-6 md:mt-12 text-center opacity-40">
-                        <p className="text-[7px] md:text-[10px] text-gray-500 font-mono tracking-[0.4em] uppercase">Navigate via System Interface</p>
+                        <p className="text-[7px] md:text-[10px] text-gray-500 font-mono tracking-[0.4em] uppercase">Tap to Select • Tap Again to Boot</p>
                     </div>
                 </div>
             </div>
