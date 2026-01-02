@@ -39,9 +39,9 @@ const WindowFrame: React.FC<WindowFrameProps> = ({
   const windowRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
   const currentPos = useRef({ x: windowState.position.x, y: windowState.position.y });
-  
+
   const [ghostSnap, setGhostSnap] = useState<'left' | 'right' | null>(null);
-  
+
   const { playSound } = useSound();
   const { isLightMode } = useTheme();
 
@@ -50,7 +50,7 @@ const WindowFrame: React.FC<WindowFrameProps> = ({
   // Sync ref with props when they change externally (e.g. snap assist)
   useEffect(() => {
     if (!isDragging.current) {
-        currentPos.current = { x: windowState.position.x, y: windowState.position.y };
+      currentPos.current = { x: windowState.position.x, y: windowState.position.y };
     }
   }, [windowState.position]);
 
@@ -80,7 +80,7 @@ const WindowFrame: React.FC<WindowFrameProps> = ({
       y: e.clientY - currentPos.current.y
     };
     onFocus();
-    
+
     // Disable transition during drag for instant response
     if (windowRef.current) windowRef.current.style.transition = 'none';
   };
@@ -89,7 +89,7 @@ const WindowFrame: React.FC<WindowFrameProps> = ({
     e.stopPropagation();
     e.preventDefault();
     if (windowState.isMaximized || isMobile) return;
-    
+
     isResizing.current = true;
     resizeStart.current = {
       x: e.clientX,
@@ -107,7 +107,7 @@ const WindowFrame: React.FC<WindowFrameProps> = ({
     const handleMouseMove = (e: MouseEvent) => {
       if (isDragging.current && !windowState.isMaximized && !isMobile) {
         e.preventDefault();
-        
+
         // Calculate new position
         const rawX = e.clientX - dragOffset.current.x;
         const rawY = e.clientY - dragOffset.current.y;
@@ -128,21 +128,21 @@ const WindowFrame: React.FC<WindowFrameProps> = ({
 
         // Visual update via RAF
         if (!rafRef.current) {
-            rafRef.current = requestAnimationFrame(() => {
-                if (windowRef.current) {
-                    windowRef.current.style.top = `${y}px`;
-                    windowRef.current.style.left = `${x}px`;
-                }
-                rafRef.current = null;
-            });
+          rafRef.current = requestAnimationFrame(() => {
+            if (windowRef.current) {
+              windowRef.current.style.top = `${y}px`;
+              windowRef.current.style.left = `${x}px`;
+            }
+            rafRef.current = null;
+          });
         }
       }
-      
+
       if (isResizing.current && !windowState.isMaximized && !isMobile) {
         e.preventDefault();
         const deltaX = e.clientX - resizeStart.current.x;
         const deltaY = e.clientY - resizeStart.current.y;
-        
+
         let newWidth = Math.max(300, resizeStart.current.width + deltaX);
         let newHeight = Math.max(200, resizeStart.current.height + deltaY);
 
@@ -153,40 +153,40 @@ const WindowFrame: React.FC<WindowFrameProps> = ({
         newHeight = Math.min(newHeight, maxHeight);
 
         if (!rafRef.current) {
-            rafRef.current = requestAnimationFrame(() => {
-                if (windowRef.current) {
-                    windowRef.current.style.width = `${newWidth}px`;
-                    windowRef.current.style.height = `${newHeight}px`;
-                }
-                rafRef.current = null;
-            });
+          rafRef.current = requestAnimationFrame(() => {
+            if (windowRef.current) {
+              windowRef.current.style.width = `${newWidth}px`;
+              windowRef.current.style.height = `${newHeight}px`;
+            }
+            rafRef.current = null;
+          });
         }
       }
     };
 
     const handleMouseUp = () => {
       if (isDragging.current) {
-          isDragging.current = false;
-          // Commit final position to React State
-          onMove(currentPos.current.x, currentPos.current.y);
-          
-          if (ghostSnap && onSnap) {
-              onSnap(ghostSnap);
-              setGhostSnap(null);
-          }
-          
-          // Re-enable transition
-          if (windowRef.current) windowRef.current.style.transition = '';
+        isDragging.current = false;
+        // Commit final position to React State
+        onMove(currentPos.current.x, currentPos.current.y);
+
+        if (ghostSnap && onSnap) {
+          onSnap(ghostSnap);
+          setGhostSnap(null);
+        }
+
+        // Re-enable transition
+        if (windowRef.current) windowRef.current.style.transition = '';
       }
-      
+
       if (isResizing.current) {
-          isResizing.current = false;
-          document.body.style.cursor = '';
-          // We need to sync the size back to React state, but we don't have the final size in a ref here easily without querying DOM
-          if (windowRef.current) {
-              onResize(windowRef.current.offsetWidth, windowRef.current.offsetHeight);
-              windowRef.current.style.transition = '';
-          }
+        isResizing.current = false;
+        document.body.style.cursor = '';
+        // We need to sync the size back to React state, but we don't have the final size in a ref here easily without querying DOM
+        if (windowRef.current) {
+          onResize(windowRef.current.offsetWidth, windowRef.current.offsetHeight);
+          windowRef.current.style.transition = '';
+        }
       }
     };
 
@@ -203,21 +203,21 @@ const WindowFrame: React.FC<WindowFrameProps> = ({
 
   // On mobile, windows are always effectively maximized
   const style: React.CSSProperties = (windowState.isMaximized || isMobile)
-    ? { 
-        top: 0, 
-        left: 0, 
-        width: '100%', 
-        height: 'calc(100% - 72px)', 
-        zIndex: windowState.zIndex, 
-        borderRadius: 0 
-      }
+    ? {
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: 'calc(100% - 72px)',
+      zIndex: windowState.zIndex,
+      borderRadius: 0
+    }
     : {
-        top: windowState.position.y,
-        left: windowState.position.x,
-        width: windowState.size.width,
-        height: windowState.size.height,
-        zIndex: windowState.zIndex,
-      };
+      top: windowState.position.y,
+      left: windowState.position.x,
+      width: windowState.size.width,
+      height: windowState.size.height,
+      zIndex: windowState.zIndex,
+    };
 
   const baseClasses = isLightMode
     ? `absolute flex flex-col bg-white/80 backdrop-blur-2xl border border-white/40 shadow-2xl overflow-hidden font-sans transition-all duration-300 ${isMobile ? '' : 'rounded-xl'}`
@@ -225,73 +225,73 @@ const WindowFrame: React.FC<WindowFrameProps> = ({
 
   return (
     <>
-        {ghostSnap && isDragging.current && !isMobile && (
-            <div 
-                className="absolute top-0 bottom-10 bg-white/10 border-2 border-white/30 backdrop-blur-sm z-50 rounded-lg pointer-events-none"
-                style={{ left: ghostSnap === 'left' ? 0 : '50%', width: '50%', height: 'calc(100% - 80px)' }}
-            />
-        )}
+      {ghostSnap && isDragging.current && !isMobile && (
+        <div
+          className="absolute top-0 bottom-10 bg-white/10 border-2 border-white/30 backdrop-blur-sm z-50 rounded-lg pointer-events-none"
+          style={{ left: ghostSnap === 'left' ? 0 : '50%', width: '50%', height: 'calc(100% - 80px)' }}
+        />
+      )}
 
+      <div
+        ref={windowRef}
+        id={`window-${windowState.id}`}
+        className={baseClasses}
+        style={style}
+        onMouseDown={!isMobile ? onFocus : undefined}
+        onContextMenu={onContextMenu}
+        tabIndex={-1}
+        role="dialog"
+        aria-labelledby={`window-title-${windowState.id}`}
+        aria-modal="false"
+      >
         <div
-            ref={windowRef}
-            id={`window-${windowState.id}`}
-            className={baseClasses}
-            style={style}
-            onMouseDown={!isMobile ? onFocus : undefined}
-            onContextMenu={onContextMenu}
-            tabIndex={-1}
-            role="dialog"
-            aria-labelledby={`window-title-${windowState.id}`}
-            aria-modal="false"
+          className={`h-10 flex items-center px-4 select-none border-b relative shrink-0 ${isLightMode ? 'bg-slate-100/50 border-slate-200/50' : 'bg-black/20 border-white/5'} ${isMobile ? '' : 'cursor-default'}`}
+          onMouseDown={handleMouseDown}
+          role="toolbar"
+          aria-label="Window Controls"
         >
-        <div
-            className={`h-12 md:h-10 flex items-center px-4 select-none border-b relative shrink-0 ${isLightMode ? 'bg-slate-100/50 border-slate-200/50' : 'bg-black/20 border-white/5'} ${isMobile ? '' : 'cursor-default'}`}
-            onMouseDown={handleMouseDown}
-            role="toolbar"
-            aria-label="Window Controls"
-        >
-            {/* Window Controls - Redesign to show all on mobile as well */}
-            <div className="flex items-center gap-2 group z-10 absolute left-4">
-                <button 
-                    onClick={handleClose} 
-                    className="w-4 h-4 md:w-3 md:h-3 rounded-full bg-[#FF5F56] border border-[#E0443E] flex items-center justify-center text-black/50 hover:text-black/80"
-                    aria-label="Close"
-                    title="Close"
-                >
-                    <X size={isMobile ? 10 : 8} className={`${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
-                </button>
-                <button 
-                    onClick={handleMinimize} 
-                    className="w-4 h-4 md:w-3 md:h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123] flex items-center justify-center text-black/50 hover:text-black/80"
-                    aria-label="Minimize"
-                    title="Minimize"
-                >
-                    <Minus size={isMobile ? 10 : 8} className={`${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
-                </button>
-                <button 
-                    onClick={handleMaximize} 
-                    className="w-4 h-4 md:w-3 md:h-3 rounded-full bg-[#27C93F] border border-[#1AAB29] flex items-center justify-center text-black/50 hover:text-black/80"
-                    aria-label="Maximize"
-                    title="Maximize"
-                >
-                    <ChevronsLeftRight size={isMobile ? 10 : 8} className={`${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 rotate-45'}`} />
-                </button>
-            </div>
-            <div className="w-full flex items-center justify-center pointer-events-none">
-                <span id={`window-title-${windowState.id}`} className={`text-xs md:text-sm font-bold md:font-medium ${isLightMode ? 'text-slate-600' : 'text-white/80'}`}>{windowState.title}</span>
-            </div>
+          {/* Window Controls - Redesign to show all on mobile as well */}
+          <div className="flex items-center gap-2 group z-10 absolute left-4">
+            <button
+              onClick={handleClose}
+              className="w-4 h-4 md:w-3 md:h-3 rounded-full bg-[#FF5F56] border border-[#E0443E] flex items-center justify-center text-black/50 hover:text-black/80"
+              aria-label="Close"
+              title="Close"
+            >
+              <X size={isMobile ? 10 : 8} className={`${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
+            </button>
+            <button
+              onClick={handleMinimize}
+              className="w-4 h-4 md:w-3 md:h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123] flex items-center justify-center text-black/50 hover:text-black/80"
+              aria-label="Minimize"
+              title="Minimize"
+            >
+              <Minus size={isMobile ? 10 : 8} className={`${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
+            </button>
+            <button
+              onClick={handleMaximize}
+              className="w-4 h-4 md:w-3 md:h-3 rounded-full bg-[#27C93F] border border-[#1AAB29] flex items-center justify-center text-black/50 hover:text-black/80"
+              aria-label="Maximize"
+              title="Maximize"
+            >
+              <ChevronsLeftRight size={isMobile ? 10 : 8} className={`${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 rotate-45'}`} />
+            </button>
+          </div>
+          <div className="w-full flex items-center justify-center pointer-events-none">
+            <span id={`window-title-${windowState.id}`} className={`text-xs md:text-sm font-bold md:font-medium ${isLightMode ? 'text-slate-600' : 'text-white/80'}`}>{windowState.title}</span>
+          </div>
         </div>
         <div className={`flex-1 overflow-hidden relative ${isLightMode ? 'bg-white/20' : 'bg-[#0d1117]/90'}`}>
-            {children}
+          {children}
         </div>
         {!windowState.isMaximized && !isMobile && (
-            <div 
-                className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize z-50" 
-                onMouseDown={handleResizeMouseDown} 
-                aria-label="Resize Window"
-            />
+          <div
+            className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize z-50"
+            onMouseDown={handleResizeMouseDown}
+            aria-label="Resize Window"
+          />
         )}
-        </div>
+      </div>
     </>
   );
 };
