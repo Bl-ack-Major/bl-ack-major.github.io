@@ -20,7 +20,7 @@ const NarrativeHUD: React.FC = () => {
     // Calculate clue progress for the active chapter
     const activeClues = clues.filter(c => c.chapter === displayChapterId);
     const discoveredCount = activeClues.filter(c => c.discovered).length;
-    
+
     const handleDownloadCertificate = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (!account) return;
@@ -34,7 +34,7 @@ const NarrativeHUD: React.FC = () => {
     // Minimized Completed State
     if (isCampaignComplete && !isOpen) {
         return (
-            <div 
+            <div
                 onClick={() => setIsOpen(true)}
                 className="fixed top-16 right-4 z-[100] cursor-pointer bg-gradient-to-r from-purple-900/90 to-blue-900/90 backdrop-blur-md border border-blue-500/50 p-2 rounded-full shadow-[0_0_20px_rgba(147,51,234,0.3)] flex items-center gap-3 pr-4 animate-in fade-in slide-in-from-right duration-500 group hover:scale-105 transition-transform"
             >
@@ -47,11 +47,11 @@ const NarrativeHUD: React.FC = () => {
     }
 
     return (
-        <div 
-            className={`fixed top-16 right-4 z-[100] w-80 bg-black/80 backdrop-blur-md border border-[#367BF0]/30 rounded-xl overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.5)] text-gray-200 transition-all duration-300 font-sans ${isOpen ? 'max-h-[600px]' : 'max-h-[62px]'}`}
+        <div
+            className={`fixed top-16 right-4 md:right-4 z-[100] w-[calc(100vw-2rem)] md:w-80 bg-black/80 backdrop-blur-md border border-[#367BF0]/30 rounded-xl overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.5)] text-gray-200 transition-all duration-300 font-sans ${isOpen ? 'max-h-[600px]' : 'max-h-[62px]'}`}
         >
             {/* Header */}
-            <div 
+            <div
                 className={`px-4 py-3.5 flex justify-between items-center cursor-pointer hover:bg-white/5 transition-colors select-none ${isOpen ? 'border-b border-white/10' : ''}`}
                 onClick={() => setIsOpen(!isOpen)}
             >
@@ -72,14 +72,13 @@ const NarrativeHUD: React.FC = () => {
                     {!isCampaignComplete && (
                         <div className="flex gap-1.5">
                             {activeClues.map((clue, idx) => (
-                                <div 
+                                <div
                                     key={clue.id}
                                     title={clue.title}
-                                    className={`w-2 h-2 rounded-full transition-all duration-500 ${
-                                        clue.discovered 
-                                            ? 'bg-[#367BF0] shadow-[0_0_8px_#367BF0] scale-110' 
+                                    className={`w-2 h-2 rounded-full transition-all duration-500 ${clue.discovered
+                                            ? 'bg-[#367BF0] shadow-[0_0_8px_#367BF0] scale-110'
                                             : 'bg-gray-700'
-                                    }`}
+                                        }`}
                                 />
                             ))}
                         </div>
@@ -92,7 +91,7 @@ const NarrativeHUD: React.FC = () => {
 
             {/* Expanded Content */}
             <div className={`transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                
+
                 {/* Completion View */}
                 {isCampaignComplete ? (
                     <div className="p-6 text-center bg-gradient-to-b from-[#367BF0]/10 to-transparent">
@@ -103,7 +102,7 @@ const NarrativeHUD: React.FC = () => {
                         <p className="text-xs text-gray-400 mb-6 px-2 leading-relaxed">
                             You have successfully uncovered the breach, identified the insider, and neutralized the exfiltration attempt.
                         </p>
-                        <button 
+                        <button
                             onClick={handleDownloadCertificate}
                             className="w-full py-2.5 bg-[#367BF0] hover:bg-[#2d6cdb] text-white rounded-lg text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-[#367BF0]/40"
                         >
@@ -118,19 +117,18 @@ const NarrativeHUD: React.FC = () => {
                                 const isCurrent = chapter.id === currentChapter;
                                 const isLocked = !chapter.isUnlocked;
                                 const isDone = chapter.isCompleted;
-                                
+
                                 // Clues for this specific chapter in the list
                                 const chapClues = clues.filter(c => c.chapter === chapter.id);
                                 const chapFound = chapClues.filter(c => c.discovered).length;
 
                                 return (
-                                    <div 
+                                    <div
                                         key={chapter.id}
-                                        className={`flex items-center justify-between p-2.5 rounded-lg transition-all ${
-                                            isCurrent 
-                                                ? 'bg-[#367BF0]/10 border border-[#367BF0]/20' 
+                                        className={`flex items-center justify-between p-2.5 rounded-lg transition-all ${isCurrent
+                                                ? 'bg-[#367BF0]/10 border border-[#367BF0]/20'
                                                 : 'hover:bg-white/5 border border-transparent'
-                                        } ${isLocked ? 'opacity-40' : 'opacity-100'}`}
+                                            } ${isLocked ? 'opacity-40' : 'opacity-100'}`}
                                     >
                                         <div className="flex items-center gap-3">
                                             <div className={`
@@ -145,7 +143,7 @@ const NarrativeHUD: React.FC = () => {
                                                 </span>
                                             </div>
                                         </div>
-                                        
+
                                         {/* Status Indicator */}
                                         {isCurrent && (
                                             <span className="text-[10px] font-mono text-[#367BF0] font-bold bg-[#367BF0]/10 px-1.5 py-0.5 rounded">
