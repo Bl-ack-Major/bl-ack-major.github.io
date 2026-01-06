@@ -3,11 +3,15 @@ import React, { useEffect, useState, useRef } from 'react';
 import { X, ArrowDown, Sparkles, Terminal, Briefcase, Shield, ChevronRight, Cpu, Zap, Command } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
+import { AppId } from '../types';
+
 interface DesktopWelcomeProps {
     onClose: () => void;
+    onOpenApp: (id: AppId) => void;
+    onOpenStartMenu: (category: string) => void;
 }
 
-const DesktopWelcome: React.FC<DesktopWelcomeProps> = ({ onClose }) => {
+const DesktopWelcome: React.FC<DesktopWelcomeProps> = ({ onClose, onOpenApp, onOpenStartMenu }) => {
     const [visible, setVisible] = useState(false);
     const { isLightMode } = useTheme();
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -109,14 +113,25 @@ const DesktopWelcome: React.FC<DesktopWelcomeProps> = ({ onClose }) => {
                             </div>
                         </div>
 
-                        {/* Feature Cards */}
                         <div className="grid grid-cols-2 gap-2.5 mb-5">
-                            <div className={`relative group p-3 rounded-xl border transition-all ${isLightMode ? 'bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-100 hover:border-cyan-300' : 'bg-white/[0.03] border-white/5 hover:bg-white/[0.06] hover:border-cyan-500/30'}`}>
+                            <div
+                                onClick={() => {
+                                    onOpenApp(AppId.RESUME);
+                                    onClose();
+                                }}
+                                className={`relative group p-3 rounded-xl border transition-all cursor-pointer ${isLightMode ? 'bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-100 hover:border-cyan-300 shadow-sm hover:shadow-md' : 'bg-white/[0.03] border-white/5 hover:bg-white/[0.06] hover:border-cyan-500/30'}`}
+                            >
                                 <Briefcase size={16} className={`mb-2 ${isLightMode ? 'text-cyan-600' : 'text-cyan-400'}`} />
                                 <p className={`text-xs font-semibold ${textColorMain}`}>Resume</p>
                                 <p className={`text-[10px] mt-0.5 ${textColorSec}`}>On Desktop</p>
                             </div>
-                            <div className={`relative group p-3 rounded-xl border transition-all ${isLightMode ? 'bg-gradient-to-br from-purple-50 to-pink-50 border-purple-100 hover:border-purple-300' : 'bg-white/[0.03] border-white/5 hover:bg-white/[0.06] hover:border-purple-500/30'}`}>
+                            <div
+                                onClick={() => {
+                                    onOpenStartMenu('all');
+                                    onClose();
+                                }}
+                                className={`relative group p-3 rounded-xl border transition-all cursor-pointer ${isLightMode ? 'bg-gradient-to-br from-purple-50 to-pink-50 border-purple-100 hover:border-purple-300 shadow-sm hover:shadow-md' : 'bg-white/[0.03] border-white/5 hover:bg-white/[0.06] hover:border-purple-500/30'}`}
+                            >
                                 <Terminal size={14} className={`mb-2 ${isLightMode ? 'text-purple-600' : 'text-purple-400'}`} />
                                 <p className={`text-xs font-semibold ${textColorMain}`}>Start Menu</p>
                                 <p className={`text-[10px] mt-0.5 ${textColorSec}`}>Full Access</p>

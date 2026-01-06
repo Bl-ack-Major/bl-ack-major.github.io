@@ -72,6 +72,7 @@ const DesktopEnvironment: React.FC<{ bootStage: BootStage; setBootStage: (stage:
   const [showAdminWelcome, setShowAdminWelcome] = useState(false);
   const [showRecruiterWelcome, setShowRecruiterWelcome] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [startMenuCategory, setStartMenuCategory] = useState<string | undefined>(undefined);
 
   const { addNotification } = useToast();
   const { playSound } = useSound();
@@ -269,11 +270,17 @@ const DesktopEnvironment: React.FC<{ bootStage: BootStage; setBootStage: (stage:
         onAppClick={(id) => openApp(id)}
         onStartClick={(e) => {
           e.stopPropagation();
+          setStartMenuCategory(undefined);
           setIsStartMenuOpen(!isStartMenuOpen);
         }}
       />
 
-      <StartMenu isOpen={isStartMenuOpen} onClose={() => setIsStartMenuOpen(false)} onAppClick={(id) => openApp(id)} />
+      <StartMenu
+        isOpen={isStartMenuOpen}
+        onClose={() => setIsStartMenuOpen(false)}
+        onAppClick={(id) => openApp(id)}
+        initialCategory={startMenuCategory}
+      />
 
       {contextMenu && (
         <ContextMenu x={contextMenu.x} y={contextMenu.y} items={contextMenu.items} onClose={() => setContextMenu(null)} />
@@ -284,7 +291,16 @@ const DesktopEnvironment: React.FC<{ bootStage: BootStage; setBootStage: (stage:
       <ResourceLimitModal isOpen={showLimitWarning} onClose={() => setShowLimitWarning(false)} />
       <LevelUpModal />
       <AdminWelcomeModal isOpen={showAdminWelcome} onClose={() => setShowAdminWelcome(false)} />
-      {showRecruiterWelcome && <DesktopWelcome onClose={() => setShowRecruiterWelcome(false)} />}
+      {showRecruiterWelcome && (
+        <DesktopWelcome
+          onClose={() => setShowRecruiterWelcome(false)}
+          onOpenApp={(id) => openApp(id)}
+          onOpenStartMenu={(category) => {
+            setStartMenuCategory(category);
+            setIsStartMenuOpen(true);
+          }}
+        />
+      )}
     </div>
   );
 };

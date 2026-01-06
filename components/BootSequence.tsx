@@ -365,7 +365,7 @@ const KaliSplashAnimation: React.FC<{ progress: number }> = ({ progress }) => {
             </div>
 
             {/* 6. Main Dragon Logo Container */}
-            <div className="relative z-10 w-[280px] h-[280px] md:w-[380px] md:h-[380px] mb-8">
+            <div className="relative z-10 w-[320px] h-[320px] md:w-[450px] md:h-[450px] mb-8">
 
                 {/* Ambient Bloom Behind Logo */}
                 <div
@@ -518,17 +518,6 @@ const KaliSplashAnimation: React.FC<{ progress: number }> = ({ progress }) => {
             </div>
 
             {/* 8. Film Grain / Noise Overlay */}
-            <div
-                className="absolute inset-0 pointer-events-none z-20 mix-blend-overlay"
-                style={{
-                    opacity: 0.015,
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-                    animation: 'filmGrain 0.5s steps(10) infinite'
-                }}
-            />
-
-            {/* 9. Kernel Log Overlay */}
-            <BackgroundKernelLogs />
 
             {/* Animation Keyframes */}
             <style dangerouslySetInnerHTML={{

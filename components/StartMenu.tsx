@@ -19,6 +19,7 @@ interface StartMenuProps {
     isOpen: boolean;
     onClose: () => void;
     onAppClick: (id: AppId) => void;
+    initialCategory?: string;
 }
 
 interface AppEntry {
@@ -72,8 +73,8 @@ const uniqueAppsMap = new Map();
 allAppsFlat.forEach(item => uniqueAppsMap.set(item.name, item));
 APP_DATA['all'] = Array.from(uniqueAppsMap.values());
 
-export const StartMenu: React.FC<StartMenuProps> = ({ isOpen, onClose, onAppClick }) => {
-    const [activeCategory, setActiveCategory] = useState('fav');
+export const StartMenu: React.FC<StartMenuProps> = ({ isOpen, onClose, onAppClick, initialCategory }) => {
+    const [activeCategory, setActiveCategory] = useState(initialCategory || 'fav');
     const [searchQuery, setSearchQuery] = useState('');
     const [recentApps, setRecentApps] = useState<AppEntry[]>([]);
     const [selectedIndex, setSelectedIndex] = useState<number>(-1);
@@ -94,12 +95,15 @@ export const StartMenu: React.FC<StartMenuProps> = ({ isOpen, onClose, onAppClic
             setSearchQuery('');
             setSelectedIndex(-1);
             setMobileCategoryOpen(false);
+            if (initialCategory) {
+                setActiveCategory(initialCategory);
+            }
             // Focus search on open only on desktop
             if (window.innerWidth >= 768) {
                 setTimeout(() => searchInputRef.current?.focus(), 50);
             }
         }
-    }, [isOpen]);
+    }, [isOpen, initialCategory]);
 
     if (!isOpen) return null;
 
